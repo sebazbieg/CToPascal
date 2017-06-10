@@ -51,24 +51,6 @@ public class Translator {
             System.out.println(progBuf);
         }
 
-//        public void enterInitial(miniCParser.InitialContext ctx) {
-//        }
-//
-//        public void exitInitial(miniCParser.InitialContext ctx) {
-//        }
-//
-//        public void enterBlockItemList(miniCParser.BlockItemListContext ctx) {
-//        }
-//
-//        public void exitBlockItemList(miniCParser.BlockItemListContext ctx) {
-//        }
-//
-//        public void enterBlockItem(miniCParser.BlockItemContext ctx) {
-//        }
-//
-//        public void exitBlockItem(miniCParser.BlockItemContext ctx) {
-//        }
-
         public void enterSelectionStat(miniCParser.SelectionStatContext ctx) {
             buf.append("If ");
             buf.append(ctx.expression().getChild(0));
@@ -165,21 +147,6 @@ public class Translator {
             constBuf.append("\n");
         }
 
-//        public void exitConstDecl(miniCParser.ConstDeclContext ctx) {
-//        }
-//
-//        public void enterExpression(miniCParser.ExpressionContext ctx) {
-//        }
-//
-//        public void exitExpression(miniCParser.ExpressionContext ctx) {
-//        }
-//
-//        public void enterStat(miniCParser.StatContext ctx) {
-//        }
-//
-//        public void exitStat(miniCParser.StatContext ctx) {
-//        }
-
         public void enterBlock(miniCParser.BlockContext ctx) {
             buf.append("Begin");
             buf.append("\n");
@@ -199,21 +166,6 @@ public class Translator {
             buf.append("\n");
 
         }
-
-//        public void exitElseStat(miniCParser.ElseStatContext ctx) {
-//        }
-//
-//        public void enterEveryRule(ParserRuleContext ctx) {
-//        }
-//
-//        public void exitEveryRule(ParserRuleContext ctx) {
-//        }
-//
-//        public void visitTerminal(TerminalNode node) {
-//        }
-//
-//        public void visitErrorNode(ErrorNode node) {
-//        }
 
         public String retLogType(String logType) {
 
