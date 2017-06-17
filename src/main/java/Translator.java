@@ -1,48 +1,57 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Array;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Translator {
     public static class Translation extends miniCBaseListener {
 
-        ArrayList<String> integer = new ArrayList<String>();
-        ArrayList<String> real = new ArrayList<String>();
-        StringBuilder progBuf = new StringBuilder();
-        StringBuilder buf = new StringBuilder();
-        StringBuilder varBuf = new StringBuilder();
-        StringBuilder constBuf = new StringBuilder();
+        private ArrayList<String> integer = new ArrayList<>();
+        private ArrayList<String> real = new ArrayList<>();
+        private StringBuilder progBuf = new StringBuilder();
+        private StringBuilder buf = new StringBuilder();
+        private StringBuilder varBuf = new StringBuilder();
+        private StringBuilder constBuf = new StringBuilder();
+        private ArrayList parBuf = new ArrayList();
+        private int countingVar = 0;
 
-        public void enterStart(miniCParser.StartContext ctx) {
+        StringBuilder getProgBuf() {
+            return progBuf;
         }
 
         public void exitStart(miniCParser.StartContext ctx) {
-            progBuf.append("Var");
-            progBuf.append("\n");
-            if(!(integer.isEmpty())){
-                for (int i = 0; i < integer.size() - 1; i++) {
-                    progBuf.append(integer.get(i));
-                    progBuf.append(", ");
-                }
-                progBuf.append(integer.get(integer.size()-1));
-                progBuf.append(" : integer;");
+            if(!(integer.isEmpty()) || !(real.isEmpty())) {
+                progBuf.append("Var");
                 progBuf.append("\n");
-            }
-            if(!(real.isEmpty())){
-                for (int i = 0; i < real.size() - 2; i++) {
-                    progBuf.append(real.get(i));
-                    progBuf.append(", ");
+                if (!(integer.isEmpty())) {
+                    for (int i = 0; i < integer.size() - 1; i++) {
+                        progBuf.append(integer.get(i));
+                        progBuf.append(", ");
+                    }
+                    progBuf.append(integer.get(integer.size() - 1));
+                    progBuf.append(" : integer;");
+                    progBuf.append("\n");
                 }
-                progBuf.append(real.get(real.size()-1));
-                progBuf.append(" ");
-                progBuf.append(": real;");
-                progBuf.append("\n");
+                if (!(real.isEmpty())) {
+                    for (int i = 0; i < real.size() - 2; i++) {
+                        progBuf.append(real.get(i));
+                        progBuf.append(", ");
+                    }
+                    progBuf.append(real.get(real.size() - 1));
+                    progBuf.append(" ");
+                    progBuf.append(": real;");
+                    progBuf.append("\n");
+                }
             }
-            progBuf.append("Const");
-            progBuf.append("\n");
-            progBuf.append(constBuf);
+            if(constBuf.length()!=0) {
+                progBuf.append("Const");
+                progBuf.append("\n");
+                progBuf.append(constBuf);
+            }
             progBuf.append("Begin");
             progBuf.append("\n");
             progBuf.append(varBuf);
@@ -62,9 +71,6 @@ public class Translator {
             buf.append("\n");
         }
 
-        public void exitSelectionStat(miniCParser.SelectionStatContext ctx) {
-        }
-
         public void enterIterationStat(miniCParser.IterationStatContext ctx) {
             buf.append("While ");
             buf.append(ctx.expression().getChild(0));
@@ -76,22 +82,16 @@ public class Translator {
             buf.append("\n");
         }
 
-        public void exitIterationStat(miniCParser.IterationStatContext ctx) {
-        }
-
         public void enterAssigmentStat(miniCParser.AssigmentStatContext ctx) {
                 buf.append(ctx.getChild(0));
                 buf.append(" ");
                 buf.append(":=");
                 buf.append(" ");
                 buf.append(ctx.getChild(2));
-                if(ctx.parent.parent.getRuleIndex()!=4) {
+                if(ctx.parent.parent.getRuleIndex()!=5) {
                     buf.append(";");
                 }
                 buf.append("\n");
-        }
-
-        public void exitAssigmentStat(miniCParser.AssigmentStatContext ctx) {
         }
 
         public void enterArithmeticStat(miniCParser.ArithmeticStatContext ctx) {
@@ -104,19 +104,16 @@ public class Translator {
             buf.append(retArithType(String.valueOf(ctx.getChild(3))));
             buf.append(" ");
             buf.append(ctx.getChild(4));
-            if(ctx.parent.parent.getRuleIndex()!=4) {
+            if(ctx.parent.parent.getRuleIndex()!=5) {
                 buf.append(";");
             }
             buf.append("\n");
         }
 
-        public void exitArithmeticStat(miniCParser.ArithmeticStatContext ctx) {
-        }
-
         public void enterVaribleDecl(miniCParser.VaribleDeclContext ctx) {
             if(String.valueOf(ctx.getChild(0)).equals("float") || String.valueOf(ctx.getChild(0)).equals("double")){
                 real.add(String.valueOf(ctx.getChild(1)));
-                if(ctx.getChild(2) != null){
+                if(ctx.getChild(3) != null){
                     varBuf.append(ctx.getChild(1));
                     varBuf.append(" := ");
                     varBuf.append(ctx.getChild(3));
@@ -125,7 +122,7 @@ public class Translator {
                 }
             } else {
                 integer.add(String.valueOf(ctx.getChild(1)));
-                if(ctx.getChild(2) != null) {
+                if(ctx.getChild(3) != null) {
                     varBuf.append(ctx.getChild(1));
                     varBuf.append(" :=");
                     varBuf.append(" ");
@@ -134,9 +131,6 @@ public class Translator {
                     varBuf.append("\n");
                 }
             }
-        }
-
-        public void exitVaribleDecl(miniCParser.VaribleDeclContext ctx) {
         }
 
         public void enterConstDecl(miniCParser.ConstDeclContext ctx) {
@@ -153,7 +147,7 @@ public class Translator {
         }
 
         public void exitBlock(miniCParser.BlockContext ctx) {
-            if(ctx.parent.parent.getRuleIndex()==4) {
+            if(ctx.parent.parent.getRuleIndex()==5) {
                 buf.append("End");
             } else {
                 buf.append("End;");
@@ -164,10 +158,79 @@ public class Translator {
         public void enterElseStat(miniCParser.ElseStatContext ctx) {
             buf.append("Else");
             buf.append("\n");
+        }
+
+        public void enterScanf(miniCParser.ScanfContext ctx) {
+            buf.append("readln(");
+            buf.append(ctx.Word(0));
 
         }
 
-        public String retLogType(String logType) {
+        public void exitScanf(miniCParser.ScanfContext ctx) {
+            for(int i=1; i < countingVar; i++){
+                buf.append(", ");
+                buf.append(ctx.Word(i));
+            }
+            buf.append(")");
+            if(ctx.parent.parent.getRuleIndex()!=5) {
+                buf.append(";");
+            }
+            buf.append("\n");
+            countingVar = 0;
+        }
+
+        public void enterScanParam(miniCParser.ScanParamContext ctx) {
+            countingVar++;
+        }
+
+        public void enterPrintf(miniCParser.PrintfContext ctx) {
+            buf.append("writeln(");
+            for(int i=0; ctx.variables_2(i)!=null; i++){
+                if(ctx.variables_2(0).Word()==null) {
+                    parBuf.add(ctx.variables_2(i).Number());
+                } else{
+                    parBuf.add(ctx.variables_2(i).Word());
+                }
+            }
+        }
+
+        public void exitPrintf(miniCParser.PrintfContext ctx) {
+            buf.deleteCharAt(buf.length()-1);
+            buf.deleteCharAt(buf.length()-1);
+            buf.append(")");
+            if(ctx.parent.parent.getRuleIndex()!=5) {
+                buf.append(";");
+            }
+            buf.append("\n");
+            countingVar = 0;
+            parBuf.clear();
+        }
+
+        @Override public void enterVariables_1(miniCParser.Variables_1Context ctx) {
+            if(ctx.printParam()!=null) {
+                buf.append(parBuf.get(countingVar));
+                countingVar++;
+            }
+        }
+
+        @Override public void exitVariables_1(miniCParser.Variables_1Context ctx) {
+            buf.append(',');
+            buf.append(' ');
+        }
+
+        @Override public void enterPrintWord(miniCParser.PrintWordContext ctx) {
+            buf.append("'");
+            if(countingVar>0){
+                buf.append(" ");
+            }
+            for(int i=0; ctx.Word(i)!=null; i++){
+                buf.append(ctx.Word(i));
+                buf.append(' ');
+            }
+            buf.append("'");
+        }
+
+        String retLogType(String logType) {
 
             String ret = "";
 
@@ -194,28 +257,7 @@ public class Translator {
             return ret;
         }
 
-        public String retIdenType(String idenType) {
-
-            String ret = "";
-
-            switch (idenType) {
-                case "Int":
-                    ret = "Integer";
-                    break;
-                case "Short":
-                    ret = "Integer";
-                    break;
-                case "Integer":
-                    ret = "<";
-                    break;
-                case "Float":
-                    ret = "Real";
-                    break;
-            }
-            return ret;
-        }
-
-        public String retArithType(String arythType) {
+        String retArithType(String arythType) {
 
             String ret = "";
 
@@ -241,55 +283,41 @@ public class Translator {
     }
 
     public static void main(String[] args) throws Exception {
-//        String inputFile = null;
-//        if ( args.length>0 ) inputFile = args[0];
-//        InputStream is = System.in;
-//        if ( inputFile!=null ) {
-//            is = new FileInputStream(inputFile);
-//        }
-        String is = "    int main()\n" +
-                "    {\n" +
-                "        int i = 0;\n" +
-                "\t\tint sum = 0;\n" +
-                "\t\tfloat dram = 0;\n" +
-                "\t\tconst int bumm = 2; \n" +
-                "       \n" +
-                "        while( i < 10 ) {\n" +
-                "          sum = i;\n" +
-                "        }\n" +
-                "        if(i==9){\n" +
-                "        \ti=10;\n" +
-                "\t\t} else i = 11;\n" +
-                "\t\t\n" +
-                "\t\twhile( i < 10 ) {\n" +
-                "          sum = i;\n" +
-                "        }\n" +
-                "        if(i==9){\n" +
-                "            i=10;\n" +
-                "            i=i+10;\n" +
-                "          sum = i;\n" +
-                "           {\n" +
-                "            i=10;\n" +
-                "            i=i+10;\n" +
-                "            i=i/10;\n" +
-                "            i=i%10;\n" +
-                "          sum = i;\n" +
-                "        }\n" +
-                "        }\n" +
-                "\t\t    else {\n" +
-                "\t\t    i = 11;\n" +
-                "\t\t    }\n" +
-                "    }";
-        ANTLRInputStream input = new ANTLRInputStream(is);
+
+//        final String FILE = "C:\\Users\\A\\Desktop\\example.cpp";
+
+        File file = new File("src\\main\\examples\\examples.c");
+
+        BufferedReader br = new BufferedReader(new FileReader(file.getPath()));
+        String inputText;
+
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            inputText = sb.toString();
+        } finally {
+            br.close();
+        }
+
+        ANTLRInputStream input = new ANTLRInputStream(inputText);
         miniCLexer lexer = new miniCLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         miniCParser parser = new miniCParser(tokens);
         parser.setBuildParseTree(true);
         ParseTree tree = parser.start();
-        // show tree in text form
+         /* show tree in text form */
 //        System.out.println(tree.toStringTree(parser));
         ParseTreeWalker walker = new ParseTreeWalker();
         Translation converter = new Translation();
         walker.walk(converter, tree);
+        try(  PrintWriter out = new PrintWriter( "src\\main\\examples\\examples.txt" )  ){
+            out.println(converter.getProgBuf());
+        }
     }
 }

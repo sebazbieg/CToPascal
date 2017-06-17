@@ -18,6 +18,16 @@ public interface miniCListener extends ParseTreeListener {
 	 */
 	void exitStart(miniCParser.StartContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link miniCParser#lib}.
+	 * @param ctx the parse tree
+	 */
+	void enterLib(miniCParser.LibContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#lib}.
+	 * @param ctx the parse tree
+	 */
+	void exitLib(miniCParser.LibContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link miniCParser#initial}.
 	 * @param ctx the parse tree
 	 */
@@ -98,6 +108,16 @@ public interface miniCListener extends ParseTreeListener {
 	 */
 	void exitArithmeticStat(miniCParser.ArithmeticStatContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link miniCParser#inOutStat}.
+	 * @param ctx the parse tree
+	 */
+	void enterInOutStat(miniCParser.InOutStatContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#inOutStat}.
+	 * @param ctx the parse tree
+	 */
+	void exitInOutStat(miniCParser.InOutStatContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link miniCParser#constDecl}.
 	 * @param ctx the parse tree
 	 */
@@ -117,6 +137,26 @@ public interface miniCListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpression(miniCParser.ExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#scanf}.
+	 * @param ctx the parse tree
+	 */
+	void enterScanf(miniCParser.ScanfContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#scanf}.
+	 * @param ctx the parse tree
+	 */
+	void exitScanf(miniCParser.ScanfContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#printf}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintf(miniCParser.PrintfContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#printf}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintf(miniCParser.PrintfContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link miniCParser#stat}.
 	 * @param ctx the parse tree
@@ -147,4 +187,64 @@ public interface miniCListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitElseStat(miniCParser.ElseStatContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#scanVar}.
+	 * @param ctx the parse tree
+	 */
+	void enterScanVar(miniCParser.ScanVarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#scanVar}.
+	 * @param ctx the parse tree
+	 */
+	void exitScanVar(miniCParser.ScanVarContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#scanParam}.
+	 * @param ctx the parse tree
+	 */
+	void enterScanParam(miniCParser.ScanParamContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#scanParam}.
+	 * @param ctx the parse tree
+	 */
+	void exitScanParam(miniCParser.ScanParamContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#variables_1}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariables_1(miniCParser.Variables_1Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#variables_1}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariables_1(miniCParser.Variables_1Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#variables_2}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariables_2(miniCParser.Variables_2Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#variables_2}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariables_2(miniCParser.Variables_2Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#printParam}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintParam(miniCParser.PrintParamContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#printParam}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintParam(miniCParser.PrintParamContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link miniCParser#printWord}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintWord(miniCParser.PrintWordContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link miniCParser#printWord}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintWord(miniCParser.PrintWordContext ctx);
 }
