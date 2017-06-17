@@ -199,9 +199,6 @@ LeftParen : '(';
 RightParen : ')';
 LeftBrace : '{';
 RightBrace : '}';
-Semi : ';';
-Comma : ',';
-QuotationMarks: '"';
 
 fragment
 Nondigit

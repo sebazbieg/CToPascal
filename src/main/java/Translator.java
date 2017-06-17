@@ -12,18 +12,14 @@ public class Translator {
 
         private ArrayList<String> integer = new ArrayList<>();
         private ArrayList<String> real = new ArrayList<>();
+        private ArrayList<String> parBuf = new ArrayList<>();
         private StringBuilder progBuf = new StringBuilder();
         private StringBuilder buf = new StringBuilder();
         private StringBuilder varBuf = new StringBuilder();
         private StringBuilder constBuf = new StringBuilder();
-        private ArrayList parBuf = new ArrayList();
         private int countingVar = 0;
 
-        StringBuilder getProgBuf() {
-            return progBuf;
-        }
-
-        public void exitStart(miniCParser.StartContext ctx) {
+        @Override public void exitStart(miniCParser.StartContext ctx) {
             if(!(integer.isEmpty()) || !(real.isEmpty())) {
                 progBuf.append("Var");
                 progBuf.append("\n");
@@ -60,7 +56,7 @@ public class Translator {
             System.out.println(progBuf);
         }
 
-        public void enterSelectionStat(miniCParser.SelectionStatContext ctx) {
+        @Override public void enterSelectionStat(miniCParser.SelectionStatContext ctx) {
             buf.append("If ");
             buf.append(ctx.expression().getChild(0));
             buf.append(" ");
@@ -71,7 +67,7 @@ public class Translator {
             buf.append("\n");
         }
 
-        public void enterIterationStat(miniCParser.IterationStatContext ctx) {
+        @Override public void enterIterationStat(miniCParser.IterationStatContext ctx) {
             buf.append("While ");
             buf.append(ctx.expression().getChild(0));
             buf.append(" ");
@@ -82,7 +78,7 @@ public class Translator {
             buf.append("\n");
         }
 
-        public void enterAssigmentStat(miniCParser.AssigmentStatContext ctx) {
+        @Override public void enterAssigmentStat(miniCParser.AssigmentStatContext ctx) {
                 buf.append(ctx.getChild(0));
                 buf.append(" ");
                 buf.append(":=");
@@ -94,7 +90,7 @@ public class Translator {
                 buf.append("\n");
         }
 
-        public void enterArithmeticStat(miniCParser.ArithmeticStatContext ctx) {
+        @Override public void enterArithmeticStat(miniCParser.ArithmeticStatContext ctx) {
             buf.append(ctx.getChild(0));
             buf.append(" ");
             buf.append(":=");
@@ -110,7 +106,7 @@ public class Translator {
             buf.append("\n");
         }
 
-        public void enterVaribleDecl(miniCParser.VaribleDeclContext ctx) {
+        @Override public void enterVaribleDecl(miniCParser.VaribleDeclContext ctx) {
             if(String.valueOf(ctx.getChild(0)).equals("float") || String.valueOf(ctx.getChild(0)).equals("double")){
                 real.add(String.valueOf(ctx.getChild(1)));
                 if(ctx.getChild(3) != null){
@@ -133,7 +129,7 @@ public class Translator {
             }
         }
 
-        public void enterConstDecl(miniCParser.ConstDeclContext ctx) {
+        @Override public void enterConstDecl(miniCParser.ConstDeclContext ctx) {
             constBuf.append(ctx.getChild(2));
             constBuf.append(" = ");
             constBuf.append(ctx.getChild(4));
@@ -141,12 +137,12 @@ public class Translator {
             constBuf.append("\n");
         }
 
-        public void enterBlock(miniCParser.BlockContext ctx) {
+        @Override public void enterBlock(miniCParser.BlockContext ctx) {
             buf.append("Begin");
             buf.append("\n");
         }
 
-        public void exitBlock(miniCParser.BlockContext ctx) {
+        @Override public void exitBlock(miniCParser.BlockContext ctx) {
             if(ctx.parent.parent.getRuleIndex()==5) {
                 buf.append("End");
             } else {
@@ -155,18 +151,18 @@ public class Translator {
             buf.append("\n");
         }
 
-        public void enterElseStat(miniCParser.ElseStatContext ctx) {
+        @Override public void enterElseStat(miniCParser.ElseStatContext ctx) {
             buf.append("Else");
             buf.append("\n");
         }
 
-        public void enterScanf(miniCParser.ScanfContext ctx) {
+        @Override public void enterScanf(miniCParser.ScanfContext ctx) {
             buf.append("readln(");
             buf.append(ctx.Word(0));
 
         }
 
-        public void exitScanf(miniCParser.ScanfContext ctx) {
+        @Override public void exitScanf(miniCParser.ScanfContext ctx) {
             for(int i=1; i < countingVar; i++){
                 buf.append(", ");
                 buf.append(ctx.Word(i));
@@ -179,22 +175,22 @@ public class Translator {
             countingVar = 0;
         }
 
-        public void enterScanParam(miniCParser.ScanParamContext ctx) {
+        @Override public void enterScanParam(miniCParser.ScanParamContext ctx) {
             countingVar++;
         }
 
-        public void enterPrintf(miniCParser.PrintfContext ctx) {
+        @Override public void enterPrintf(miniCParser.PrintfContext ctx) {
             buf.append("writeln(");
             for(int i=0; ctx.variables_2(i)!=null; i++){
                 if(ctx.variables_2(0).Word()==null) {
-                    parBuf.add(ctx.variables_2(i).Number());
+                    parBuf.add(String.valueOf(ctx.variables_2(i).Number()));
                 } else{
-                    parBuf.add(ctx.variables_2(i).Word());
+                    parBuf.add(String.valueOf(ctx.variables_2(i).Word()));
                 }
             }
         }
 
-        public void exitPrintf(miniCParser.PrintfContext ctx) {
+        @Override public void exitPrintf(miniCParser.PrintfContext ctx) {
             buf.deleteCharAt(buf.length()-1);
             buf.deleteCharAt(buf.length()-1);
             buf.append(")");
@@ -284,14 +280,10 @@ public class Translator {
 
     public static void main(String[] args) throws Exception {
 
-//        final String FILE = "C:\\Users\\A\\Desktop\\example.cpp";
-
         File file = new File("src\\main\\examples\\example.c");
-
-        BufferedReader br = new BufferedReader(new FileReader(file.getPath()));
         String inputText;
 
-        try {
+        try (BufferedReader br = new BufferedReader(new FileReader(file.getPath()))) {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 
@@ -301,8 +293,6 @@ public class Translator {
                 line = br.readLine();
             }
             inputText = sb.toString();
-        } finally {
-            br.close();
         }
 
         ANTLRInputStream input = new ANTLRInputStream(inputText);
@@ -316,8 +306,8 @@ public class Translator {
         ParseTreeWalker walker = new ParseTreeWalker();
         Translation converter = new Translation();
         walker.walk(converter, tree);
-        try(  PrintWriter out = new PrintWriter( "src\\main\\examples\\exampleInPascal.txt" )  ){
-            out.println(converter.getProgBuf());
+        try(PrintWriter out = new PrintWriter( "src\\main\\examples\\exampleInPascal.txt" )){
+            out.println(converter.progBuf);
         }
     }
 }
