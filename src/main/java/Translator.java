@@ -286,7 +286,7 @@ public class Translator {
 
 //        final String FILE = "C:\\Users\\A\\Desktop\\example.cpp";
 
-        File file = new File("src\\main\\examples\\examples.c");
+        File file = new File("src\\main\\examples\\example.c");
 
         BufferedReader br = new BufferedReader(new FileReader(file.getPath()));
         String inputText;
@@ -316,7 +316,7 @@ public class Translator {
         ParseTreeWalker walker = new ParseTreeWalker();
         Translation converter = new Translation();
         walker.walk(converter, tree);
-        try(  PrintWriter out = new PrintWriter( "src\\main\\examples\\examples.txt" )  ){
+        try(  PrintWriter out = new PrintWriter( "src\\main\\examples\\exampleInPascal.txt" )  ){
             out.println(converter.getProgBuf());
         }
     }

@@ -1,0 +1,28 @@
+Var
+num1, num2, gcd, lcm, remainder, numerator, denominator : integer;
+Begin
+writeln('Enter two numbers ');
+readln(num1, num2);
+If num1 > num2 Then
+Begin
+numerator := num1;
+denominator := num2;
+End
+Else
+Begin
+numerator := num2;
+denominator := num1;
+End;
+remainder := numerator mod denominator;
+While remainder <> 0 do
+Begin
+numerator := denominator;
+denominator := remainder;
+remainder := numerator mod denominator;
+End;
+gcd := denominator;
+lcm := num1 * num2;
+lcm := lcm div gcd;
+writeln('Greatest common divisor of ', num1, ' and ', num2, ' is ', gcd);
+writeln('Least common multiple of ', num1, ' and ', num2, ' is ', lcm);
+End.
