@@ -53,7 +53,7 @@ public class Translator {
             progBuf.append(varBuf);
             progBuf.append(buf);
             progBuf.append("End.");
-            System.out.println(progBuf);
+//            System.out.println(progBuf);
         }
 
         @Override public void enterSelectionStat(miniCParser.SelectionStatContext ctx) {
